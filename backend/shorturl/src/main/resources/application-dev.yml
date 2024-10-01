@@ -1,0 +1,10 @@
+spring:
+  data:
+    mongodb:
+      #authentication-database: admin
+      host: localhost
+      port: 27017
+      #username: root
+      #password: password
+      database: shorturl_db
+      #auto-index-creation: true
