@@ -11,5 +11,7 @@ public interface UrlService {
     List<Url> getAllUrls();
     List<UrlBasicDto> getAllUrlBasic();
     UrlBasicDto createShortUrl(LongUrlPostDto longUrlPostDto);
+    UrlBasicDto createShortUrl(UrlBasicDto urlBasicDto);
+
     String getLongUrl(String shortUrl);
 }

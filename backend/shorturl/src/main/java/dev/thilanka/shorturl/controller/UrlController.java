@@ -3,6 +3,7 @@ package dev.thilanka.shorturl.controller;
 import dev.thilanka.shorturl.dto.LongUrlPostDto;
 import dev.thilanka.shorturl.dto.UrlBasicDto;
 import dev.thilanka.shorturl.service.UrlService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,8 +20,15 @@ public class UrlController {
 
     //-- CREATE NEW SHORT-URL
     @PostMapping("/api/url")
-    ResponseEntity<UrlBasicDto> createUrl(@RequestBody LongUrlPostDto longUrlPostDto) {
+    ResponseEntity<UrlBasicDto> createUrl(@Valid @RequestBody LongUrlPostDto longUrlPostDto) {
         UrlBasicDto savedUrl = urlService.createShortUrl(longUrlPostDto);
+        return ResponseEntity.ok(savedUrl);
+    }
+
+    //-- CREATE NEW SHORT-URL WITH GIVEN SHORT-URL
+    @PostMapping("/api/urls")
+    ResponseEntity<UrlBasicDto> createUrl(@Valid @RequestBody UrlBasicDto urlBasicDto) {
+        UrlBasicDto savedUrl = urlService.createShortUrl(urlBasicDto);
         return ResponseEntity.ok(savedUrl);
     }
 
@@ -37,5 +45,7 @@ public class UrlController {
         String longUrl = urlService.getLongUrl(shortUrl);
         return ResponseEntity.status(302).location(URI.create(longUrl)).build();
     }
+
+
 
 }
