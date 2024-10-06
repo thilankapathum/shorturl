@@ -1,14 +1,14 @@
 spring:
   data:
     mongodb:
-      #authentication-database: admin
       host: localhost
       port: 27017
+      database: shorturl_db
+      #authentication-database: admin
       #username: root
       #password: password
-      database: shorturl_db
       #auto-index-creation: true
 
 shorturl:
   service:
-    baseurl: http://localhost:8080/
+    baseurl: ${BASE_URL:http://localhost:8080/} # BASE_URL can be input as Environment Variable in Docker run. Default value is http://localhost:8080

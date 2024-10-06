@@ -19,7 +19,7 @@ import java.util.Random;
 
 @Service
 public class UrlServiceImpl implements UrlService {
-    
+
     //-- Defined baseurl at application-dev.yml
     @Value("${shorturl.service.baseurl}")
     private String BASE_URL;
