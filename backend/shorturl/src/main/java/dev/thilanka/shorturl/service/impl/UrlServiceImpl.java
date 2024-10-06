@@ -19,6 +19,8 @@ import java.util.Random;
 @Service
 public class UrlServiceImpl implements UrlService {
 
+    private final String BASE_URL = "http://localhost:8080/";
+
     @Autowired
     private UrlRepository urlRepository;
 
@@ -32,7 +34,7 @@ public class UrlServiceImpl implements UrlService {
     @Override
     public List<UrlBasicDto> getAllUrlBasic() {
         List<Url> urls = urlRepository.findAll();
-        return urls.stream().map((url) -> new UrlMapper().UrlToBasic(url)).toList();
+        return urls.stream().map((url) -> new UrlMapper().UrlToBasic(url,BASE_URL)).toList();
     }
 
     //-- CREATE SHORT-URL WITH ONLY LONG-URL
@@ -46,9 +48,9 @@ public class UrlServiceImpl implements UrlService {
             Url savedUrl = new Url();
             savedUrl.setShortUrl(generateShortUrl(6, 128));
             savedUrl.setLongUrl(longUrlPostDto.getLongUrl());
-            return new UrlMapper().UrlToBasic(urlRepository.save(savedUrl));
+            return new UrlMapper().UrlToBasic(urlRepository.save(savedUrl),BASE_URL);
         } else {
-            return new UrlMapper().UrlToBasic(url);
+            return new UrlMapper().UrlToBasic(url, BASE_URL);
         }
     }
 
@@ -62,7 +64,7 @@ public class UrlServiceImpl implements UrlService {
             if (Objects.isNull(urlRepository.findByShortUrl(urlBasicDto.getShortUrl()))) {
                 url.setShortUrl(urlBasicDto.getShortUrl());
             } else {
-                throw new ResourceAlreadyExistsException("Short URL", urlBasicDto.getShortUrl());
+                throw new ResourceAlreadyExistsException("Short URL", BASE_URL + urlBasicDto.getShortUrl());
             }
         } else {
 //            throw new RuntimeException("Short URL contains invalid characters");
@@ -74,18 +76,18 @@ public class UrlServiceImpl implements UrlService {
             url.setLongUrl(urlBasicDto.getLongUrl());
         } else {
             String shortUrl = urlRepository.findByLongUrl(urlBasicDto.getLongUrl()).getShortUrl();
-            throw new ResourceAlreadyExistsException("Long URL", "Short URL", shortUrl);
+            throw new ResourceAlreadyExistsException("Long URL", "Short URL", BASE_URL + shortUrl);
         }
 
         //-- SAVE URL COMBINATION & RETURN DTO
-        return new UrlMapper().UrlToBasic(urlRepository.save(url));
+        return new UrlMapper().UrlToBasic(urlRepository.save(url),BASE_URL);
     }
 
     @Override
     public String getLongUrl(String shortUrl) {
         Url url = urlRepository.findByShortUrl(shortUrl);
         if (Objects.isNull(url)) {
-            throw new ResourceNotFoundException("Long URL", "Short URL", shortUrl);
+            throw new ResourceNotFoundException("Long URL", "Short URL", BASE_URL + shortUrl);
         } else {
             return url.getLongUrl();
         }
@@ -103,7 +105,7 @@ public class UrlServiceImpl implements UrlService {
                 throw new RuntimeException("Loop times reached. Try again");
             }
             shortUrl = generateRandomString(charLength);
-            System.out.println("Short URL: " + shortUrl);
+            System.out.println("Short URL: " + BASE_URL + shortUrl);
             counter++;
         } while (!Objects.isNull(urlRepository.findByShortUrl(shortUrl)));
         return shortUrl;
