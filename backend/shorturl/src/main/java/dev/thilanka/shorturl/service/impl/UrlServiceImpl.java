@@ -3,6 +3,8 @@ package dev.thilanka.shorturl.service.impl;
 import dev.thilanka.shorturl.dto.LongUrlPostDto;
 import dev.thilanka.shorturl.dto.UrlBasicDto;
 import dev.thilanka.shorturl.entity.Url;
+import dev.thilanka.shorturl.exception.ResourceAlreadyExistsException;
+import dev.thilanka.shorturl.exception.ResourceNotFoundException;
 import dev.thilanka.shorturl.mapper.UrlMapper;
 import dev.thilanka.shorturl.repository.UrlRepository;
 import dev.thilanka.shorturl.service.UrlService;
@@ -56,10 +58,15 @@ public class UrlServiceImpl implements UrlService {
         Url url = new Url();
 
         //-- CHECK FOR EXISTING SHORT-URL && CHECK SHORT-URL FOR INVALID CHARACTERS
-        if (Objects.isNull(urlRepository.findByShortUrl(urlBasicDto.getShortUrl())) && isAlphanumeric(urlBasicDto.getShortUrl())) {
-            url.setShortUrl(urlBasicDto.getShortUrl());
+        if (isAlphanumeric(urlBasicDto.getShortUrl())) {
+            if (Objects.isNull(urlRepository.findByShortUrl(urlBasicDto.getShortUrl()))) {
+                url.setShortUrl(urlBasicDto.getShortUrl());
+            } else {
+                throw new ResourceAlreadyExistsException("Short URL", urlBasicDto.getShortUrl());
+            }
         } else {
-            throw new RuntimeException("Short Url Already Exists OR contains invalid characters.");
+//            throw new RuntimeException("Short URL contains invalid characters");
+            throw new IllegalArgumentException("Short URL contains invalid characters");
         }
 
         //-- CHECK FOR EXISTING LONG-URL
@@ -67,7 +74,7 @@ public class UrlServiceImpl implements UrlService {
             url.setLongUrl(urlBasicDto.getLongUrl());
         } else {
             String shortUrl = urlRepository.findByLongUrl(urlBasicDto.getLongUrl()).getShortUrl();
-            throw new RuntimeException("Long URL already defined with the Short URL: /" + shortUrl );
+            throw new ResourceAlreadyExistsException("Long URL", "Short URL", shortUrl);
         }
 
         //-- SAVE URL COMBINATION & RETURN DTO
@@ -78,7 +85,7 @@ public class UrlServiceImpl implements UrlService {
     public String getLongUrl(String shortUrl) {
         Url url = urlRepository.findByShortUrl(shortUrl);
         if (Objects.isNull(url)) {
-            throw new RuntimeException("Short URL is invalid");
+            throw new ResourceNotFoundException("Long URL", "Short URL", shortUrl);
         } else {
             return url.getLongUrl();
         }
@@ -103,12 +110,12 @@ public class UrlServiceImpl implements UrlService {
     }
 
     //-- RANDOM STRING GENERATOR
-    private String generateRandomString(int count){
+    private String generateRandomString(int count) {
         String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
         Random random = new SecureRandom();
         StringBuilder stringBuilder = new StringBuilder(count);
 
-        for (int i = 0; i < count; i++){
+        for (int i = 0; i < count; i++) {
             int index = random.nextInt(characters.length());
             stringBuilder.append(characters.charAt(index));
         }
@@ -117,8 +124,8 @@ public class UrlServiceImpl implements UrlService {
     }
 
     //-- ALPHANUMERIC CHARACTER CHECKER
-    private boolean isAlphanumeric(String string){
-        return string != null && string.matches("[a-zA-Z0-9]");
+    private boolean isAlphanumeric(String string) {
+        return string != null && string.matches("[a-zA-Z0-9]+");
     }
 
 }
