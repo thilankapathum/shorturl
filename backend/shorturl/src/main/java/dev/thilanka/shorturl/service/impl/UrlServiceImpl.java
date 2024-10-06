@@ -9,6 +9,7 @@ import dev.thilanka.shorturl.mapper.UrlMapper;
 import dev.thilanka.shorturl.repository.UrlRepository;
 import dev.thilanka.shorturl.service.UrlService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.security.SecureRandom;
@@ -18,8 +19,10 @@ import java.util.Random;
 
 @Service
 public class UrlServiceImpl implements UrlService {
-
-    private final String BASE_URL = "http://localhost:8080/";
+    
+    //-- Defined baseurl at application-dev.yml
+    @Value("${shorturl.service.baseurl}")
+    private String BASE_URL;
 
     @Autowired
     private UrlRepository urlRepository;

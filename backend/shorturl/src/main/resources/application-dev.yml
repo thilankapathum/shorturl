@@ -8,3 +8,7 @@ spring:
       #password: password
       database: shorturl_db
       #auto-index-creation: true
+
+shorturl:
+  service:
+    baseurl: http://localhost:8080/
