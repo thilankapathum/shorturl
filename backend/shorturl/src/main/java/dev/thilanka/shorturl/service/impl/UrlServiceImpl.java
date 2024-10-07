@@ -6,8 +6,11 @@ import dev.thilanka.shorturl.entity.Url;
 import dev.thilanka.shorturl.exception.ResourceAlreadyExistsException;
 import dev.thilanka.shorturl.exception.ResourceNotFoundException;
 import dev.thilanka.shorturl.mapper.UrlMapper;
+import dev.thilanka.shorturl.repository.AllowedDomainsRepository;
 import dev.thilanka.shorturl.repository.UrlRepository;
+import dev.thilanka.shorturl.service.AllowedDomainsService;
 import dev.thilanka.shorturl.service.UrlService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -18,14 +21,23 @@ import java.util.Objects;
 import java.util.Random;
 
 @Service
+@RequiredArgsConstructor
 public class UrlServiceImpl implements UrlService {
 
     //-- Defined baseurl at application-dev.yml
     @Value("${shorturl.service.baseurl}")
     private String BASE_URL;
 
+    //-- Defined whether to allow all URLs to be shortened at application-dev.yml
+    @Value("${shorturl.service.allowallurls}")
+    private boolean ALLOW_ALL_URLS;
+
     @Autowired
     private UrlRepository urlRepository;
+    @Autowired
+    private AllowedDomainsService allowedDomainsService;
+    @Autowired
+    private AllowedDomainsRepository allowedDomainsRepository;
 
     //-- GET ALL URLS WITH ALL INFO
     @Override
@@ -37,23 +49,33 @@ public class UrlServiceImpl implements UrlService {
     @Override
     public List<UrlBasicDto> getAllUrlBasic() {
         List<Url> urls = urlRepository.findAll();
-        return urls.stream().map((url) -> new UrlMapper().UrlToBasic(url,BASE_URL)).toList();
+        return urls.stream().map((url) -> new UrlMapper().UrlToBasic(url, BASE_URL)).toList();
     }
 
     //-- CREATE SHORT-URL WITH ONLY LONG-URL
     @Override
     public UrlBasicDto createShortUrl(LongUrlPostDto longUrlPostDto) {
 
-        Url url = urlRepository.findByLongUrl(longUrlPostDto.getLongUrl());
+        //-- CHECK WHETHER TLD IS ALLOWED (Whether all URL shortening is allowed OR Whether Domain of Long URL is included in Allowed Domains Database)
+        String topLevelDomain = allowedDomainsService.domainExtractor(longUrlPostDto.getLongUrl());
 
-        //-- CHECK FOR EXISTING LONG-URL
-        if (Objects.isNull(url)) {
-            Url savedUrl = new Url();
-            savedUrl.setShortUrl(generateShortUrl(6, 128));
-            savedUrl.setLongUrl(longUrlPostDto.getLongUrl());
-            return new UrlMapper().UrlToBasic(urlRepository.save(savedUrl),BASE_URL);
+        if (ALLOW_ALL_URLS || allowedDomainsService.isDomainNameAllowed(topLevelDomain)) {
+
+            Url url = urlRepository.findByLongUrl(longUrlPostDto.getLongUrl());
+
+            //-- CHECK FOR EXISTING LONG-URL
+            if (Objects.isNull(url)) {
+                Url savedUrl = new Url();
+                savedUrl.setShortUrl(generateShortUrl(6, 128));
+                savedUrl.setLongUrl(longUrlPostDto.getLongUrl());
+
+                //-- Save new URL combination
+                return new UrlMapper().UrlToBasic(urlRepository.save(savedUrl), BASE_URL);
+            } else {
+                return new UrlMapper().UrlToBasic(url, BASE_URL);
+            }
         } else {
-            return new UrlMapper().UrlToBasic(url, BASE_URL);
+            throw new IllegalArgumentException("Domain of the URL is not accepted");
         }
     }
 
@@ -70,20 +92,27 @@ public class UrlServiceImpl implements UrlService {
                 throw new ResourceAlreadyExistsException("Short URL", BASE_URL + urlBasicDto.getShortUrl());
             }
         } else {
-//            throw new RuntimeException("Short URL contains invalid characters");
             throw new IllegalArgumentException("Short URL contains invalid characters");
         }
 
-        //-- CHECK FOR EXISTING LONG-URL
-        if (Objects.isNull(urlRepository.findByLongUrl(urlBasicDto.getLongUrl()))) {
-            url.setLongUrl(urlBasicDto.getLongUrl());
+        //-- CHECK WHETHER TLD IS ALLOWED (Whether all URL shortening is allowed OR Whether Domain of Long URL is included in Allowed Domains Database)
+        String topLevelDomain = allowedDomainsService.domainExtractor(urlBasicDto.getLongUrl());
+
+        if (ALLOW_ALL_URLS || allowedDomainsService.isDomainNameAllowed(topLevelDomain)) {
+
+            //-- CHECK FOR EXISTING LONG-URL
+            if (Objects.isNull(urlRepository.findByLongUrl(urlBasicDto.getLongUrl()))) {
+                url.setLongUrl(urlBasicDto.getLongUrl());
+            } else {
+                String shortUrl = urlRepository.findByLongUrl(urlBasicDto.getLongUrl()).getShortUrl();
+                throw new ResourceAlreadyExistsException("Long URL", "Short URL", BASE_URL + shortUrl);
+            }
         } else {
-            String shortUrl = urlRepository.findByLongUrl(urlBasicDto.getLongUrl()).getShortUrl();
-            throw new ResourceAlreadyExistsException("Long URL", "Short URL", BASE_URL + shortUrl);
+            throw new IllegalArgumentException("Domain of the URL is not accepted");
         }
 
         //-- SAVE URL COMBINATION & RETURN DTO
-        return new UrlMapper().UrlToBasic(urlRepository.save(url),BASE_URL);
+        return new UrlMapper().UrlToBasic(urlRepository.save(url), BASE_URL);
     }
 
     @Override
