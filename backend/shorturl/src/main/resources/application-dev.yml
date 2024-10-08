@@ -1,10 +1,15 @@
 spring:
   data:
     mongodb:
-      #authentication-database: admin
       host: localhost
       port: 27017
+      database: shorturl_db
+      #authentication-database: admin
       #username: root
       #password: password
-      database: shorturl_db
       #auto-index-creation: true
+
+shorturl:
+  service:
+    baseurl: ${BASE_URL:http://localhost:8080/} # BASE_URL can be input as Environment Variable in Docker run. Default value is http://localhost:8080
+    allowallurls: ${ALLOW_ALL_URLS:false}  # ALLOW_ALL_URLS is an Environment Variable. It will set whether to allow shortening all URLs or only allowed Domains.
