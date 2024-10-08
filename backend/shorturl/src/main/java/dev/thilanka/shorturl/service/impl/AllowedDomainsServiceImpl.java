@@ -89,11 +89,6 @@ public class AllowedDomainsServiceImpl implements AllowedDomainsService {
         throw new IllegalArgumentException("Domain URL is invalid. Please check");
     }
 
-//    @Override
-//    public AllowedDomains findByDomainName(String domainName) {
-//
-//        //return allowedDomainsRepository.findByAllowedDomainName(domainName);
-//    }
 
     //-- CHECK WHETHER TLD IS ALREADY DEFINED IN DATABASE
     @Override
