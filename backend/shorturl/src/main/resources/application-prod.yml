@@ -4,7 +4,7 @@ spring:
       host: localhost
       port: 27017
       database: shorturl_db
-      #authentication-database: admin
-      #username: mongoadmin
-      #password: password
+      authentication-database: admin
+      username: mongoadmin
+      password: password
       #auto-index-creation: true

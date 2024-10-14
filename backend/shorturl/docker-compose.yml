@@ -1,0 +1,34 @@
+services:
+  mongodb:
+    image: mongo
+    container_name: mongodb
+    environment:
+      - MONGO_INITDB_DATABASE=shorturl_db
+      - MONGO_INITDB_ROOT_USERNAME=mongoadmin
+      - MONGO_INITDB_ROOT_PASSWORD=password
+    ports:
+      - 27017:27017
+    networks:
+      - shorturl-net
+
+  shorturl-backend:
+    container_name: shorturl-backend
+    image: thilankapathum/shorturl:0.0.1-aws
+    environment:
+      SPRING_DATA_MONGODB_HOST: mongodb
+      SPRING_DATA_MONGODB_PORT: 27017
+      SPRING_DATA_MONGODB_USERNAME: mongoadmin
+      SPRING_DATA_MONGODB_PASSWORD: password
+      SPRING_DATA_MONGODB_AUTHENTICATION_DATABASE: admin
+      ALLOW_ALL_URLS: true
+    depends_on:
+      - mongodb
+    ports:
+      - 8080:8080
+    networks:
+      - shorturl-net
+    restart: unless-stopped
+
+networks:
+  shorturl-net:
+    driver: bridge

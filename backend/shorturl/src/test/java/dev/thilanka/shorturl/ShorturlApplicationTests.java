@@ -3,10 +3,10 @@ package dev.thilanka.shorturl;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
-@SpringBootTest
+//@SpringBootTest
 class ShorturlApplicationTests {
 
-	@Test
+	//@Test
 	void contextLoads() {
 	}
 

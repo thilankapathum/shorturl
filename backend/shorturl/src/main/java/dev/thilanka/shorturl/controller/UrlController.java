@@ -5,6 +5,7 @@ import dev.thilanka.shorturl.dto.UrlBasicDto;
 import dev.thilanka.shorturl.service.UrlService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,6 +18,12 @@ public class UrlController {
 
     @Autowired
     private UrlService urlService;
+
+    @Value("${shorturl.service.defaultredirect}")
+    private boolean DEFAULT_REDIRECT;
+
+    @Value("${shorturl.service.defaultredirecturl}")
+    private String DEFAULT_REDIRECT_URL;
 
     //-- CREATE NEW SHORT-URL
     @PostMapping("/api/url")
@@ -41,11 +48,17 @@ public class UrlController {
 
     //-- REDIRECT TO LONG-URL USING EXISTING SHORT-URL
     @GetMapping("/{shortUrl}")
-    public ResponseEntity<Void> redirectToLongUrl(@PathVariable("shortUrl") String shortUrl){
+    public ResponseEntity<Void> redirectToLongUrl(@PathVariable("shortUrl") String shortUrl) {
         String longUrl = urlService.getLongUrl(shortUrl);
         return ResponseEntity.status(302).location(URI.create(longUrl)).build();
     }
 
-
+    //-- REDIRECT TO A PRE-DEFINED DEFAULT URL AT BASE URL. REMOVE THIS IF THIS FUNCTION IS NOT NEEDED
+    @GetMapping("")
+    public ResponseEntity<Void> redirectToDefault() {
+        if (DEFAULT_REDIRECT) {
+            return ResponseEntity.status(302).location(URI.create(DEFAULT_REDIRECT_URL)).build();
+        } else return null;
+    }
 
 }
