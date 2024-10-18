@@ -2,9 +2,9 @@ package dev.thilanka.shorturl.security.config;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -12,14 +12,15 @@ import javax.crypto.SecretKey;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 import java.util.function.Function;
 
 @Service
 public class JwtService {
 
-    private static final String SECRET_KEY = "dfa2740015423f40da7388b4abed8adcd2c89e4e3b31a70ebbe59d1537d7aa2f3061fc8df5b2ff5ebac2b29a470c9e1fae9f7c42b91de951850c32a47d9a3111";
-    private static final int EXPIRATION_TIME = 120;     //-- JWT expiration time in minutes
+    @Value("${shorturl.service.jwt-secret}")
+    private String JWT_SECRET;
+    @Value("${shorturl.service.jwt-expiration}")
+    private int JWT_EXPIRATION;     //-- JWT expiration time in minutes
 
     //-- EXTRACTING CLAIMS --
 
@@ -54,7 +55,7 @@ public class JwtService {
 
     //-- Decode SECRET_KEY to Base64 to be included/signed the JWT
     private SecretKey getSignInKey() {
-        byte[] secretKey = Decoders.BASE64.decode(SECRET_KEY);
+        byte[] secretKey = Decoders.BASE64.decode(JWT_SECRET);
         return Keys.hmacShaKeyFor(secretKey);
     }
 
@@ -68,7 +69,7 @@ public class JwtService {
                 .claims(extraClaims)
                 .subject(userDetails.getUsername())
                 .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME * 60 * 1000))
+                .expiration(new Date(System.currentTimeMillis() + JWT_EXPIRATION * 60 * 1000))
                 .signWith(getSignInKey())
                 .compact();
     }

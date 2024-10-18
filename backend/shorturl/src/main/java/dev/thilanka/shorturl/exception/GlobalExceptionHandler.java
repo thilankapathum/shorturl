@@ -2,6 +2,8 @@ package dev.thilanka.shorturl.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -93,6 +95,31 @@ public class GlobalExceptionHandler {
                         .customErrorCode(CustomErrorCodes.INVALID_DETAILS.getErrorCode())
                         .customErrorDescription(CustomErrorCodes.INVALID_DETAILS.getDescription())
                         .validationErrors(errors)
+                        .build()
+                );
+    }
+
+    @ExceptionHandler(UsernameNotFoundException.class)
+    public ResponseEntity<ExceptionResponse> handleException(UsernameNotFoundException exception) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ExceptionResponse
+                        .builder()
+                        .customErrorCode(CustomErrorCodes.INVALID_DETAILS.getErrorCode())
+                        .customErrorDescription(CustomErrorCodes.INVALID_DETAILS.getDescription())
+                        .error(exception.getMessage())
+                        .build()
+                );
+
+    }
+
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<ExceptionResponse> handleException(BadCredentialsException exception) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ExceptionResponse
+                        .builder()
+                        .customErrorCode(CustomErrorCodes.INVALID_DETAILS.getErrorCode())
+                        .customErrorDescription(CustomErrorCodes.INVALID_DETAILS.getDescription())
+                        .error(exception.getMessage())
                         .build()
                 );
     }

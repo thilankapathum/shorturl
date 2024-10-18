@@ -1,7 +1,7 @@
 package dev.thilanka.shorturl.security.user;
 
 import dev.thilanka.shorturl.security.config.AuthenticationResponse;
-import dev.thilanka.shorturl.security.config.AuthenticationService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -14,16 +14,16 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class UserController {
 
-    private final AuthenticationService authenticationService;
+    private final UserService userService;
 
     @PostMapping("/signup")
-    public ResponseEntity<AuthenticationResponse> signUp(@RequestBody SignUpRequest request){
-        return ResponseEntity.ok(authenticationService.signUp(request));
+    public ResponseEntity<AuthenticationResponse> signUp(@Valid @RequestBody SignUpRequest request){
+        return ResponseEntity.ok(userService.signUp(request));
     }
 
     @PostMapping("/signin")
-    public ResponseEntity<AuthenticationResponse> signIn(@RequestBody SignInRequest request){
-        return ResponseEntity.ok(authenticationService.signIn(request));
+    public ResponseEntity<AuthenticationResponse> signIn(@Valid @RequestBody SignInRequest request){
+        return ResponseEntity.ok(userService.signIn(request));
     }
 
 }

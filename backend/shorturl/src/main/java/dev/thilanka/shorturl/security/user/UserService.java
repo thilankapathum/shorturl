@@ -1,6 +1,7 @@
-package dev.thilanka.shorturl.security.config;
+package dev.thilanka.shorturl.security.user;
 
-import dev.thilanka.shorturl.security.user.*;
+import dev.thilanka.shorturl.security.config.AuthenticationResponse;
+import dev.thilanka.shorturl.security.config.JwtService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -11,7 +12,7 @@ import org.springframework.stereotype.Service;
 //-- USER AUTHENTICATION WHEN SIGN-UP AND SIGN-IN --
 @Service
 @RequiredArgsConstructor
-public class AuthenticationService {
+public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -47,7 +48,7 @@ public class AuthenticationService {
         //-- username & password is correct at here... (authenticationManager will throw exception if username or password are invalid)
         var user = userRepository
                 .findByUsername(request.getUsername())
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+                .orElseThrow(() -> new UsernameNotFoundException("User not found by: " + request.getUsername()));
 
         var jwt = jwtService.generateJwt(user);
 

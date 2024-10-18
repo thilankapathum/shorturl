@@ -4,8 +4,9 @@ import dev.thilanka.shorturl.security.user.Role;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -16,6 +17,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @RequiredArgsConstructor
 @EnableWebSecurity
+@EnableMethodSecurity(prePostEnabled = true)    //-- Enable method-level authorization(security) for the mentioned Roles.
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthFilter;
@@ -28,7 +30,9 @@ public class SecurityConfig {
         http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auths ->
                         auths
-                                .requestMatchers("/api/custom-url/**").hasAnyAuthority(Role.ADMIN.name(),Role.MANAGER.name())
+//                                .requestMatchers(HttpMethod.GET, "/api/domains/**").authenticated()
+//                                .requestMatchers("/api/domains/**").hasAuthority(Role.ADMIN.name())
+//                                .requestMatchers("/api/custom-url/**").hasAnyAuthority(Role.ADMIN.name(),Role.MANAGER.name())
                                 .requestMatchers("/api/**").authenticated()
                                 .requestMatchers("/auth/**","/**").permitAll()
                                 .anyRequest().authenticated())

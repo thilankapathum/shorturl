@@ -7,6 +7,7 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
@@ -33,6 +34,7 @@ public class UrlController {
     }
 
     //-- CREATE NEW SHORT-URL WITH GIVEN SHORT-URL
+    @PreAuthorize("hasAnyAuthority('ADMIN','MANAGER')")     //-- Only Admins & Managers can create custom shortURLs.
     @PostMapping("/api/custom-url")
     ResponseEntity<UrlBasicDto> createUrl(@Valid @RequestBody UrlBasicDto urlBasicDto) {
         UrlBasicDto savedUrl = urlService.createShortUrl(urlBasicDto);
