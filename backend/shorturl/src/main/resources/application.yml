@@ -2,7 +2,7 @@ spring:
   application:
     name: shorturl
   profiles:
-    active: prod
+    active: dev
 
 shorturl:
   service:

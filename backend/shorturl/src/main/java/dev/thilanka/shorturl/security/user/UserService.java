@@ -19,23 +19,18 @@ public class UserService {
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
 
-    public AuthenticationResponse signUp(SignUpRequest request) {
+    public void signUp(SignUpRequest request) {
         var user = User.builder()
                 .firstName(request.getFirstName())
                 .lastName(request.getLastName())
                 .email(request.getEmail())
                 .username(request.getUsername())
                 .password(passwordEncoder.encode(request.getPassword()))
+                .disabled(true)
                 .role(Role.USER)
                 .build();
 
         userRepository.save(user);
-        var jwt = jwtService.generateJwt(user);
-
-        //-- Generate & return JWT immediately after creating the User.
-        return AuthenticationResponse.builder()
-                .jwt(jwt)
-                .build();
     }
 
     public AuthenticationResponse signIn(SignInRequest request) {
@@ -50,9 +45,10 @@ public class UserService {
                 .findByUsername(request.getUsername())
                 .orElseThrow(() -> new UsernameNotFoundException("User not found by: " + request.getUsername()));
 
-        var jwt = jwtService.generateJwt(user);
+        if (!user.isDisabled()) {
+            var jwt = jwtService.generateJwt(user);
+            return AuthenticationResponse.builder().jwt(jwt).build();
+        } else throw new RuntimeException("User account is disabled");
 
-        return AuthenticationResponse.builder().jwt(jwt).build();
     }
-
 }

@@ -17,6 +17,6 @@ public class SignInRequest {
     private String username;
     @NotNull(message = "Password should not be empty")
     @NotBlank(message = "Password should not be empty")
-    @Size(min = 8, max = 16,message = "Password should be 8-16 characters long")
+    @Size(min = 8, max = 24,message = "Password should be 8-24 characters long")
     private String password;
 }

@@ -2,6 +2,7 @@ package dev.thilanka.shorturl.security.user;
 
 import lombok.*;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -22,9 +23,12 @@ public class User implements UserDetails {  //-- UserDetails is Spring Security 
     private String  id;
     private String firstName;
     private String lastName;
+    @Indexed(unique = true)
     private String email;
+    @Indexed(unique = true)
     private String username;
     private String password;
+    private boolean disabled;   //-- Custom account-disabled field.
 
     private Role role;
 

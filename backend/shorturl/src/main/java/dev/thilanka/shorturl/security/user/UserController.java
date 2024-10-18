@@ -3,6 +3,7 @@ package dev.thilanka.shorturl.security.user;
 import dev.thilanka.shorturl.security.config.AuthenticationResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -17,8 +18,9 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping("/signup")
-    public ResponseEntity<AuthenticationResponse> signUp(@Valid @RequestBody SignUpRequest request){
-        return ResponseEntity.ok(userService.signUp(request));
+    public ResponseEntity<?> signUp(@Valid @RequestBody SignUpRequest request){
+        userService.signUp(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body("User account created by: " + request.getUsername());
     }
 
     @PostMapping("/signin")
