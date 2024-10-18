@@ -33,7 +33,7 @@ public class UrlController {
     }
 
     //-- CREATE NEW SHORT-URL WITH GIVEN SHORT-URL
-    @PostMapping("/api/urls")
+    @PostMapping("/api/custom-url")
     ResponseEntity<UrlBasicDto> createUrl(@Valid @RequestBody UrlBasicDto urlBasicDto) {
         UrlBasicDto savedUrl = urlService.createShortUrl(urlBasicDto);
         return ResponseEntity.ok(savedUrl);
@@ -45,6 +45,8 @@ public class UrlController {
         List<UrlBasicDto> urlBasicDtos = urlService.getAllUrlBasic();
         return ResponseEntity.ok(urlBasicDtos);
     }
+
+
 
     //-- REDIRECT TO LONG-URL USING EXISTING SHORT-URL
     @GetMapping("/{shortUrl}")
