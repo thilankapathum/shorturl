@@ -1,24 +1,24 @@
 package dev.thilanka.shorturl.mapper;
 
 
-import dev.thilanka.shorturl.dto.UrlBasicDto;
-import dev.thilanka.shorturl.entity.Url;
+import dev.thilanka.shorturl.entity.url.CustomUrlRequest;
+import dev.thilanka.shorturl.entity.url.Url;
 
 public class UrlMapper {
-    public UrlBasicDto UrlToBasic(Url url) {
-        return new UrlBasicDto(url.getLongUrl(), url.getShortUrl());
+    public CustomUrlRequest UrlToBasic(Url url) {
+        return new CustomUrlRequest(url.getLongUrl(), url.getShortUrl());
     }
 
     //-- Include Base URL of the site as prefix for the Short URL
-    public UrlBasicDto UrlToBasic(Url url, String baseUrl) {
+    public CustomUrlRequest UrlToBasic(Url url, String baseUrl) {
         String fullShortUrl = baseUrl + url.getShortUrl();
-        return new UrlBasicDto(url.getLongUrl(), fullShortUrl);
+        return new CustomUrlRequest(url.getLongUrl(), fullShortUrl);
     }
 
-    public Url UrlBasicDtoToUrl(UrlBasicDto urlBasicDto) {
+    public Url UrlBasicDtoToUrl(CustomUrlRequest customUrlRequest) {
         Url url = new Url();
-        url.setLongUrl(urlBasicDto.getLongUrl());
-        url.setShortUrl(urlBasicDto.getShortUrl());
+        url.setLongUrl(customUrlRequest.getLongUrl());
+        url.setShortUrl(customUrlRequest.getShortUrl());
         return url;
     }
 }

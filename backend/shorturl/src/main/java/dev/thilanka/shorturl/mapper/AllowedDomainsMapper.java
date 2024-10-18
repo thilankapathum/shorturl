@@ -1,10 +1,10 @@
 package dev.thilanka.shorturl.mapper;
 
-import dev.thilanka.shorturl.dto.AllowedDomainsPostDto;
-import dev.thilanka.shorturl.entity.AllowedDomains;
+import dev.thilanka.shorturl.entity.alloweddomains.AllowedDomainRequest;
+import dev.thilanka.shorturl.entity.alloweddomains.AllowedDomains;
 
 public class AllowedDomainsMapper {
-    public AllowedDomainsPostDto AllowedDomainsToPostDto(AllowedDomains allowedDomains){
-        return new AllowedDomainsPostDto(allowedDomains.getAllowedDomainName(), allowedDomains.isEnabled());
+    public AllowedDomainRequest AllowedDomainsToPostDto(AllowedDomains allowedDomains){
+        return new AllowedDomainRequest(allowedDomains.getAllowedDomainName(), allowedDomains.isEnabled());
     }
 }

@@ -1,11 +1,11 @@
-package dev.thilanka.shorturl.service.impl;
+package dev.thilanka.shorturl.entity.alloweddomains.impl;
 
-import dev.thilanka.shorturl.dto.AllowedDomainsPostDto;
-import dev.thilanka.shorturl.entity.AllowedDomains;
+import dev.thilanka.shorturl.entity.alloweddomains.AllowedDomainRequest;
+import dev.thilanka.shorturl.entity.alloweddomains.AllowedDomains;
 import dev.thilanka.shorturl.exception.ResourceAlreadyExistsException;
 import dev.thilanka.shorturl.mapper.AllowedDomainsMapper;
-import dev.thilanka.shorturl.repository.AllowedDomainsRepository;
-import dev.thilanka.shorturl.service.AllowedDomainsService;
+import dev.thilanka.shorturl.entity.alloweddomains.AllowedDomainsRepository;
+import dev.thilanka.shorturl.entity.alloweddomains.AllowedDomainsService;
 import org.apache.commons.validator.routines.UrlValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,13 +22,13 @@ public class AllowedDomainsServiceImpl implements AllowedDomainsService {
     private AllowedDomainsRepository allowedDomainsRepository;
 
     @Override
-    public AllowedDomainsPostDto createAllowedDomain(AllowedDomainsPostDto allowedDomainsPostDto) {
+    public AllowedDomainRequest createAllowedDomain(AllowedDomainRequest allowedDomainRequest) {
 
         //-- Check validity of URL
-        if (isURLValid(allowedDomainsPostDto.getAllowedDomainName())) {
+        if (isURLValid(allowedDomainRequest.getAllowedDomainName())) {
 
             //-- Extract Top Level Domain Name (Eg: google.com)
-            String topLevelDomainName = domainExtractor(allowedDomainsPostDto.getAllowedDomainName());
+            String topLevelDomainName = domainExtractor(allowedDomainRequest.getAllowedDomainName());
 
             AllowedDomains allowedDomainCheck = allowedDomainsRepository.findByAllowedDomainName(topLevelDomainName);
 
@@ -39,7 +39,7 @@ public class AllowedDomainsServiceImpl implements AllowedDomainsService {
 
                 //-- Save only TLD
                 allowedDomain.setAllowedDomainName(topLevelDomainName);
-                allowedDomain.setEnabled(allowedDomainsPostDto.isEnabled());
+                allowedDomain.setEnabled(allowedDomainRequest.isEnabled());
                 return new AllowedDomainsMapper().AllowedDomainsToPostDto(allowedDomainsRepository.save(allowedDomain));
             } else {
                 throw new ResourceAlreadyExistsException("Domain", topLevelDomainName);
@@ -51,7 +51,7 @@ public class AllowedDomainsServiceImpl implements AllowedDomainsService {
     }
 
     @Override
-    public List<AllowedDomainsPostDto> getAllowedDomains() {
+    public List<AllowedDomainRequest> getAllowedDomains() {
         List<AllowedDomains> allowedDomains = allowedDomainsRepository.findAll();
         return allowedDomains.stream().map((url) -> new AllowedDomainsMapper().AllowedDomainsToPostDto(url)).toList();
     }
