@@ -1,5 +1,7 @@
 package dev.thilanka.shorturl.exception;
 
+import com.mongodb.DuplicateKeyException;
+import com.mongodb.MongoWriteException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -120,6 +122,32 @@ public class GlobalExceptionHandler {
                         .customErrorCode(CustomErrorCodes.INVALID_DETAILS.getErrorCode())
                         .customErrorDescription(CustomErrorCodes.INVALID_DETAILS.getDescription())
                         .error(exception.getMessage())
+                        .build()
+                );
+    }
+
+    @ExceptionHandler(MongoWriteException.class)
+    public ResponseEntity<ExceptionResponse> handleException(MongoWriteException exception){
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ExceptionResponse
+                        .builder()
+                        .customErrorCode(CustomErrorCodes.INVALID_DETAILS.getErrorCode())
+                        .customErrorDescription(CustomErrorCodes.INVALID_DETAILS.getDescription())
+                        .error("Username or email already exists")
+                        .build()
+                );
+    }
+
+    @ExceptionHandler(DuplicateKeyException.class)
+    public ResponseEntity<ExceptionResponse> handleException(DuplicateKeyException exception){
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ExceptionResponse
+                        .builder()
+                        .customErrorCode(CustomErrorCodes.INVALID_DETAILS.getErrorCode())
+                        .customErrorDescription(CustomErrorCodes.INVALID_DETAILS.getDescription())
+                        .error("Username or email already exists")
                         .build()
                 );
     }
