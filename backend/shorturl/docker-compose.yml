@@ -13,7 +13,7 @@ services:
 
   shorturl-backend:
     container_name: shorturl-backend
-    image: thilankapathum/shorturl:0.0.1-aws
+    image: thilankapathum/shorturl:0.0.2-aws
     environment:
       SPRING_DATA_MONGODB_HOST: mongodb
       SPRING_DATA_MONGODB_PORT: 27017
