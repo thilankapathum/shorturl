@@ -1,8 +1,8 @@
 FROM openjdk:17-alpine
 WORKDIR /app
-COPY /target/shorturl-0.0.1.jar /app/
+COPY /target/shorturl-0.0.2.jar /app/
 EXPOSE 8080
-CMD java -jar shorturl-0.0.1.jar
+CMD java -jar shorturl-0.0.2.jar
 
 LABEL authors="Thilanka Weerasekara"
 
