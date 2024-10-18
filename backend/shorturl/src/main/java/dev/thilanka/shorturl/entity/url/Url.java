@@ -1,4 +1,4 @@
-package dev.thilanka.shorturl.entity;
+package dev.thilanka.shorturl.entity.url;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

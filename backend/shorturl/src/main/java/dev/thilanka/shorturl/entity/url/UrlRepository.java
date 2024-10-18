@@ -1,9 +1,6 @@
-package dev.thilanka.shorturl.repository;
+package dev.thilanka.shorturl.entity.url;
 
-import dev.thilanka.shorturl.entity.Url;
 import org.springframework.data.mongodb.repository.MongoRepository;
-
-import java.util.Optional;
 
 public interface UrlRepository extends MongoRepository<Url,String> {
     Url findByShortUrl(String shortUrl);

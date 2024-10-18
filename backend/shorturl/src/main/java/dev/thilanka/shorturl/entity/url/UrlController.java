@@ -1,8 +1,5 @@
-package dev.thilanka.shorturl.controller;
+package dev.thilanka.shorturl.entity.url;
 
-import dev.thilanka.shorturl.dto.LongUrlPostDto;
-import dev.thilanka.shorturl.dto.UrlBasicDto;
-import dev.thilanka.shorturl.service.UrlService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,26 +23,26 @@ public class UrlController {
     @Value("${shorturl.service.defaultredirecturl}")
     private String DEFAULT_REDIRECT_URL;
 
-    //-- CREATE NEW SHORT-URL
+    //-- CREATE NEW AUTO-GENERATED SHORT-URL
     @PostMapping("/api/url")
-    ResponseEntity<UrlBasicDto> createUrl(@Valid @RequestBody LongUrlPostDto longUrlPostDto) {
-        UrlBasicDto savedUrl = urlService.createShortUrl(longUrlPostDto);
+    ResponseEntity<CustomUrlRequest> createUrl(@Valid @RequestBody ShortUrlRequest shortUrlRequest) {
+        CustomUrlRequest savedUrl = urlService.createShortUrl(shortUrlRequest);
         return ResponseEntity.ok(savedUrl);
     }
 
-    //-- CREATE NEW SHORT-URL WITH GIVEN SHORT-URL
+    //-- CREATE NEW CUSTOM SHORT-URL WITH GIVEN SHORT-URL
     @PreAuthorize("hasAnyAuthority('ADMIN','MANAGER')")     //-- Only Admins & Managers can create custom shortURLs.
     @PostMapping("/api/custom-url")
-    ResponseEntity<UrlBasicDto> createUrl(@Valid @RequestBody UrlBasicDto urlBasicDto) {
-        UrlBasicDto savedUrl = urlService.createShortUrl(urlBasicDto);
+    ResponseEntity<CustomUrlRequest> createUrl(@Valid @RequestBody CustomUrlRequest customUrlRequest) {
+        CustomUrlRequest savedUrl = urlService.createShortUrl(customUrlRequest);
         return ResponseEntity.ok(savedUrl);
     }
 
     //-- GET ALL URLS WITH ONLY BASIC INFO
     @GetMapping("/api/url")
-    ResponseEntity<List<UrlBasicDto>> getAllUrls() {
-        List<UrlBasicDto> urlBasicDtos = urlService.getAllUrlBasic();
-        return ResponseEntity.ok(urlBasicDtos);
+    ResponseEntity<List<CustomUrlRequest>> getAllUrls() {
+        List<CustomUrlRequest> customUrlRequests = urlService.getAllUrlBasic();
+        return ResponseEntity.ok(customUrlRequests);
     }
 
 

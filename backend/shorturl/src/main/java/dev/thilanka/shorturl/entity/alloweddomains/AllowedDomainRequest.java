@@ -1,4 +1,4 @@
-package dev.thilanka.shorturl.dto;
+package dev.thilanka.shorturl.entity.alloweddomains;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -10,7 +10,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class AllowedDomainsPostDto {
+public class AllowedDomainRequest {
     @NotNull(message = "Domain should not be empty")
     private String allowedDomainName;
     @NotNull(message = "Enabled should not be empty")
