@@ -3,7 +3,7 @@ name: Deploy Spring-boot App
 on:
   push:
     branches:
-      - main
+      - docker
 
 jobs:
   build:
@@ -21,7 +21,7 @@ jobs:
 
       - name: Build with Maven
         working-directory: ./backend
-        run: mvn clean package -Dkiptests
+        run: mvn clean package -e -Dkiptests
 
 # BUILD DOCKER IMAGE. ATTENTION TO VERSION
       - name: Docker build
