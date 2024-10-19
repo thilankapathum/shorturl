@@ -48,7 +48,6 @@ jobs:
           script: |
               sudo docker stop shorturl-backend-3 || true
               sudo docker rm shorturl-backend-3 || true
-#              sudo docker rmi thilankapathum/shorturl:0.0.3-aws || true
               sudo docker pull thilankapathum/shorturl:0.0.4-aws
             
               sudo docker run -d --name shorturl-backend-4 \ 
