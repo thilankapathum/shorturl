@@ -66,5 +66,4 @@ jobs:
                 --env SERVER_SSL_KEY_STORE="${{ secrets.SERVER_SSL_KEY_STORE }}" \
                 --env SERVER_SSL_KEY_STORE_PASSWORD="${{ secrets.SERVER_SSL_KEY_STORE_PASSWORD }}" \
                 --env SERVER_SSL_KEY_STORE_TYPE="${{ secrets.SERVER_SSL_KEY_STORE_TYPE }}" \
-                --env SERVER_SSL_KEY_ALIAS="${{ secrets.SERVER_SSL_KEY_ALIAS }}" \
-                -v /root/keystore.jks:/keystore.jks -p 443:443 --net shorturl-net thilankapathum/shorturl:0.0.4-aws
+                --env SERVER_SSL_KEY_ALIAS="${{ secrets.SERVER_SSL_KEY_ALIAS }}" -v /root/keystore.jks:/keystore.jks -p 443:443 --net shorturl-net thilankapathum/shorturl:0.0.4-aws
