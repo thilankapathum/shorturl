@@ -104,6 +104,12 @@
 				</configuration>
 			</plugin>
 		</plugins>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering> <!-- Enable filtering for resource files -->
+			</resource>
+		</resources>
 	</build>
 
 </project>

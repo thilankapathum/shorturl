@@ -1,6 +1,7 @@
 spring:
   application:
     name: shorturl
+  version: ${project.version}
   profiles:
     active: prod
 
