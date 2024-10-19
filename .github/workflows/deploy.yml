@@ -55,7 +55,7 @@ jobs:
                 -e DEFAULT_REDIRECT_URL="${{ secrets.DEFAULT_REDIRECT_URL }}" \
                 --env DEFAULT_REDIRECT="${{ secrets.DEFAULT_REDIRECT }}" \
                 --env JWT_SECRET="${{ secrets.JWT_SECRET }}" \
-                --env JWT_EXPIRATION=${{ secrets.JWT_EXPIRATION }}" \
+                --env JWT_EXPIRATION="${{ secrets.JWT_EXPIRATION }}" \
                 --env SPRING_DATA_MONGODB_HOST="${{ secrets.DB_HOST }}" \
                 --env SPRING_DATA_MONGODB_PORT="${{ secrets.DB_PORT }}" \
                 --env SPRING_DATA_MONGODB_USERNAME="${{ secrets.DB_USERNAME }}" \
@@ -66,4 +66,7 @@ jobs:
                 --env SERVER_SSL_KEY_STORE="${{ secrets.SERVER_SSL_KEY_STORE }}" \
                 --env SERVER_SSL_KEY_STORE_PASSWORD="${{ secrets.SERVER_SSL_KEY_STORE_PASSWORD }}" \
                 --env SERVER_SSL_KEY_STORE_TYPE="${{ secrets.SERVER_SSL_KEY_STORE_TYPE }}" \
-                --env SERVER_SSL_KEY_ALIAS="${{ secrets.SERVER_SSL_KEY_ALIAS }}" -v /root/keystore.jks:/keystore.jks -p 443:443 --net shorturl-net thilankapathum/shorturl:0.0.4-aws
+                --env SERVER_SSL_KEY_ALIAS="${{ secrets.SERVER_SSL_KEY_ALIAS }}" \
+                -v /root/keystore.jks:/keystore.jks \
+                -p 443:443 \
+                --net shorturl-net thilankapathum/shorturl:0.0.4-aws
