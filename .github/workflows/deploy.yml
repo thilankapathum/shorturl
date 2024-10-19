@@ -28,6 +28,7 @@ jobs:
 
 # BUILD DOCKER IMAGE. ATTENTION TO VERSION
       - name: Docker build
+        working-directory: ./backend/shorturl
         run: docker buildx build --platform linux/amd64 -t thilankapathum/shorturl:0.0.4-aws .
 
       - name: Login to Docker Hub
