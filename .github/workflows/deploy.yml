@@ -20,7 +20,7 @@ jobs:
           distribution: 'temurin'
 
       - name: Build with Maven
-        run: mvn -B package --file pom.xml
+        run: mvn -B package ./backend/pom.xml
 
 # BUILD DOCKER IMAGE. ATTENTION TO VERSION
       - name: Docker build
