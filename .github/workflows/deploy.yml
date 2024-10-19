@@ -23,7 +23,7 @@ jobs:
         run: ls -la
 
       - name: Build with Maven
-        working-directory: ./backend/
+        working-directory: ./backend/shorturl
         run: mvn clean package -e -Dkiptests
 
 # BUILD DOCKER IMAGE. ATTENTION TO VERSION
