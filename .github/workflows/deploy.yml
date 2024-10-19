@@ -50,8 +50,8 @@ jobs:
               sudo docker rm shorturl-backend-3 || true
               sudo docker pull thilankapathum/shorturl:0.0.4-aws
             
-              sudo docker run -d --name shorturl-backend-4 \ 
-                --env BASE_URL="${{ secrets.BASE_URL }}" \
+              sudo docker run -d --name shorturl-backend-4 \
+                -e BASE_URL="${{ secrets.BASE_URL }}" \
                 -e DEFAULT_REDIRECT_URL="${{ secrets.DEFAULT_REDIRECT_URL }}" \
                 --env DEFAULT_REDIRECT="${{ secrets.DEFAULT_REDIRECT }}" \
                 --env JWT_SECRET="${{ secrets.JWT_SECRET }}" \
