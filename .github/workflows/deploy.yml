@@ -46,12 +46,12 @@ jobs:
           key: ${{ secrets.AWS_SSH_PRIVATE_KEY }}
           port: 22
           script: |
-              docker stop shorturl-backend-v3 || true
-              docker rm shorturl-backend-v3 || true
-              docker rmi shorturl-backend-v3 || true
-              docker pull thilankapathum/shorturl:0.0.4-aws
+              sudo docker stop shorturl-backend-v3 || true
+              sudo docker rm shorturl-backend-v3 || true
+              sudo docker rmi shorturl-backend-v3 || true
+              sudo docker pull thilankapathum/shorturl:0.0.4-aws
             
-              docker run -d --name shorturl-backend-4 \ 
+              sudo docker run -d --name shorturl-backend-4 \ 
               -e BASE_URL=${{ secrets.BASE_URL }} \
               -e DEFAULT_REDIRECT_URL=${{ secrets.DEFAULT_REDIRECT_URL }} \
               -e DEFAULT_REDIRECT=${{ secrets.DEFAULT_REDIRECT }} \
