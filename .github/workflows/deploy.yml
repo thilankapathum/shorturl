@@ -52,21 +52,20 @@ jobs:
               sudo docker pull thilankapathum/shorturl:0.0.4-aws
             
               sudo docker run -d --name shorturl-backend-4 \ 
-                -e BASE_URL=${{ secrets.BASE_URL }} \
-                -e DEFAULT_REDIRECT_URL=${{ secrets.DEFAULT_REDIRECT_URL }} \
-                -e DEFAULT_REDIRECT=${{ secrets.DEFAULT_REDIRECT }} \
-                -e JWT_SECRET=${{ secrets.JWT_SECRET }} \
-                -e JWT_EXPIRATION=${{ secrets.JWT_EXPIRATION }} \
-                -e SPRING_DATA_MONGODB_HOST=${{ secrets.DB_HOST }} \
-                -e SPRING_DATA_MONGODB_PORT=${{ secrets.DB_PORT }} \
-                -e SPRING_DATA_MONGODB_USERNAME=${{ secrets.DB_USERNAME }} \
-                -e SPRING_DATA_MONGODB_PASSWORD=${{ secrets.DB_PASSWORD }} \
-                -e SPRING_DATA_MONGODB_AUTHENTICATION_DATABASE=${{ secrets.DB_AUTH_DATABASE }} \
-                -e ALLOW_ALL_URLS=${{ secrets.ALLOW_ALL_URLS }} \
-                -e SERVER_PORT=${{ secrets.SERVER_PORT }} \
-                -e SERVER_SSL_KEY_STORE=${{ secrets.SERVER_SSL_KEY_STORE }} \
-                -e SERVER_SSL_KEY_STORE_PASSWORD=${{ secrets.SERVER_SSL_KEY_STORE_PASSWORD }} \
-                -e SERVER_SSL_KEY_STORE_TYPE=${{ secrets.SERVER_SSL_KEY_STORE_TYPE }} \
-                -e SERVER_SSL_KEY_ALIAS=${{ secrets.SERVER_SSL_KEY_ALIAS }} \
-                -v /root/keystore.jks:/keystore.jks \
-                -p 443:443 --net shorturl-net thilankapathum/shorturl:0.0.4-aws
+                -env BASE_URL=${{ secrets.BASE_URL }} \
+                -env DEFAULT_REDIRECT_URL=${{ secrets.DEFAULT_REDIRECT_URL }} \
+                -env DEFAULT_REDIRECT=${{ secrets.DEFAULT_REDIRECT }} \
+                -env JWT_SECRET=${{ secrets.JWT_SECRET }} \
+                -env JWT_EXPIRATION=${{ secrets.JWT_EXPIRATION }} \
+                -env SPRING_DATA_MONGODB_HOST=${{ secrets.DB_HOST }} \
+                -env SPRING_DATA_MONGODB_PORT=${{ secrets.DB_PORT }} \
+                -env SPRING_DATA_MONGODB_USERNAME=${{ secrets.DB_USERNAME }} \
+                -env SPRING_DATA_MONGODB_PASSWORD=${{ secrets.DB_PASSWORD }} \
+                -env SPRING_DATA_MONGODB_AUTHENTICATION_DATABASE=${{ secrets.DB_AUTH_DATABASE }} \
+                -env ALLOW_ALL_URLS=${{ secrets.ALLOW_ALL_URLS }} \
+                -env SERVER_PORT=${{ secrets.SERVER_PORT }} \
+                -env SERVER_SSL_KEY_STORE=${{ secrets.SERVER_SSL_KEY_STORE }} \
+                -env SERVER_SSL_KEY_STORE_PASSWORD=${{ secrets.SERVER_SSL_KEY_STORE_PASSWORD }} \
+                -env SERVER_SSL_KEY_STORE_TYPE=${{ secrets.SERVER_SSL_KEY_STORE_TYPE }} \
+                -env SERVER_SSL_KEY_ALIAS=${{ secrets.SERVER_SSL_KEY_ALIAS }} \
+                -v /root/keystore.jks:/keystore.jks -p 443:443 --net shorturl-net thilankapathum/shorturl:0.0.4-aws
