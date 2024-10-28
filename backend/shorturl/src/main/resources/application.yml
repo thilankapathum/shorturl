@@ -3,7 +3,7 @@ spring:
     name: shorturl
   version: ${project.version}
   profiles:
-    active: prod
+    active: dev
 
 shorturl:
   service:

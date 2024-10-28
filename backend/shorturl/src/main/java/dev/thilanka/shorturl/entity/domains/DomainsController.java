@@ -1,4 +1,4 @@
-package dev.thilanka.shorturl.entity.alloweddomains;
+package dev.thilanka.shorturl.entity.domains;
 
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,22 +11,22 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/domains")
-public class AllowedDomainsController {
+public class DomainsController {
 
     @Autowired
-    private AllowedDomainsService allowedDomainsService;
+    private DomainsService domainsService;
 
     @PreAuthorize("hasAuthority('ADMIN')")  //-- Only ADMINs can create allowed domains
     @PostMapping
-    ResponseEntity<AllowedDomainRequest> createAllowedDomain(@Valid @RequestBody AllowedDomainRequest allowedDomainRequest){
-        AllowedDomainRequest savedAllowedDomain = allowedDomainsService.createAllowedDomain(allowedDomainRequest);
+    ResponseEntity<DomainRequest> createAllowedDomain(@Valid @RequestBody DomainRequest domainRequest){
+        DomainRequest savedAllowedDomain = domainsService.createAllowedDomain(domainRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedAllowedDomain);
     }
 
     @PreAuthorize("hasAnyAuthority('ADMIN','MANAGER','USER')")
     @GetMapping
-    ResponseEntity<List<AllowedDomainRequest>> getAllAllowedDomains(){
-        List<AllowedDomainRequest> allowedDomainsRequests = allowedDomainsService.getAllowedDomains();
+    ResponseEntity<List<DomainRequest>> getAllAllowedDomains(){
+        List<DomainRequest> allowedDomainsRequests = domainsService.getAllowedDomains();
         return ResponseEntity.ok(allowedDomainsRequests);
     }
 }

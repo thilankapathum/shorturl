@@ -1,9 +1,12 @@
 package dev.thilanka.shorturl.security.user;
 
+import dev.thilanka.shorturl.entity.domains.DomainsService;
 import dev.thilanka.shorturl.security.config.AuthenticationResponse;
 import dev.thilanka.shorturl.security.config.JwtService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -14,23 +17,35 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class UserService {
 
+    //-- Defined whether to allow all URLs to be shortened at application-dev.yml
+    @Value("${shorturl.service.allowallurls}")
+    private boolean ALLOW_ALL_URLS;
+
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
+    private final DomainsService domainsService;
 
     public void signUp(SignUpRequest request) {
-        var user = User.builder()
-                .firstName(request.getFirstName())
-                .lastName(request.getLastName())
-                .email(request.getEmail())
-                .username(request.getUsername())
-                .password(passwordEncoder.encode(request.getPassword()))
-                .disabled(true)
-                .role(Role.USER)
-                .build();
 
-        userRepository.save(user);
+        //-- Check whether email-domain is allowed (if all URL shortening is not-allowed)
+        if (ALLOW_ALL_URLS || domainsService.isEmailDomainAllowed(domainsService.emailDomainExtractor(request.getEmail()))) {
+
+            var user = User.builder()
+                    .firstName(request.getFirstName())
+                    .lastName(request.getLastName())
+                    .email(request.getEmail())
+                    .username(request.getUsername())
+                    .password(passwordEncoder.encode(request.getPassword()))
+                    .disabled(true)
+                    .role(Role.USER)
+                    .build();
+
+            userRepository.save(user);
+        } else throw new BadCredentialsException("Email address is not allowed");
+
+
     }
 
     public AuthenticationResponse signIn(SignInRequest request) {

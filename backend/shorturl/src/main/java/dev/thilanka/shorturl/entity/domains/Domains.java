@@ -1,4 +1,4 @@
-package dev.thilanka.shorturl.entity.alloweddomains;
+package dev.thilanka.shorturl.entity.domains;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -11,10 +11,12 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Document(collection = "allowed_domains")
-public class AllowedDomains {
+@Document(collection = "domains")
+public class Domains {
     @Id
     private String id;
-    private String allowedDomainName;
+    private String domainName;
     private boolean enabled;
+    private boolean urlAllowed;
+    private boolean emailAllowed;
 }
