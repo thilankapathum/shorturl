@@ -3,7 +3,7 @@ package dev.thilanka.shorturl.entity.domains.impl;
 import dev.thilanka.shorturl.entity.domains.DomainRequest;
 import dev.thilanka.shorturl.entity.domains.Domains;
 import dev.thilanka.shorturl.exception.ResourceAlreadyExistsException;
-import dev.thilanka.shorturl.mapper.AllowedDomainsMapper;
+import dev.thilanka.shorturl.mapper.DomainsMapper;
 import dev.thilanka.shorturl.entity.domains.DomainsRepository;
 import dev.thilanka.shorturl.entity.domains.DomainsService;
 import org.apache.commons.validator.routines.UrlValidator;
@@ -42,7 +42,7 @@ public class DomainsServiceImpl implements DomainsService {
                 allowedDomain.setEnabled(domainRequest.isEnabled());
                 allowedDomain.setUrlAllowed(domainRequest.isUrlAllowed());
                 allowedDomain.setEmailAllowed(domainRequest.isEmailAllowed());
-                return new AllowedDomainsMapper().AllowedDomainsToPostDto(domainsRepository.save(allowedDomain));
+                return new DomainsMapper().domainsToPostDto(domainsRepository.save(allowedDomain));
             } else {
                 throw new ResourceAlreadyExistsException("Domain", topLevelDomainName);
             }
@@ -55,7 +55,7 @@ public class DomainsServiceImpl implements DomainsService {
     @Override
     public List<DomainRequest> getAllowedDomains() {
         List<Domains> domains = domainsRepository.findAll();
-        return domains.stream().map((url) -> new AllowedDomainsMapper().AllowedDomainsToPostDto(url)).toList();
+        return domains.stream().map((url) -> new DomainsMapper().domainsToPostDto(url)).toList();
     }
 
     //-- URL VALIDITY CHECKER

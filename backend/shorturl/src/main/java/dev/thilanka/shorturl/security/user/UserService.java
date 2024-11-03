@@ -12,6 +12,10 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.util.Optional;
+import java.util.UUID;
+
 //-- USER AUTHENTICATION WHEN SIGN-UP AND SIGN-IN --
 @Service
 @RequiredArgsConstructor
@@ -27,7 +31,7 @@ public class UserService {
     private final AuthenticationManager authenticationManager;
     private final DomainsService domainsService;
 
-    public void signUp(SignUpRequest request) {
+    public User signUp(SignUpRequest request) {
 
         //-- Check whether email-domain is allowed (if all URL shortening is not-allowed)
         if (ALLOW_ALL_URLS || domainsService.isEmailDomainAllowed(domainsService.emailDomainExtractor(request.getEmail()))) {
@@ -39,13 +43,14 @@ public class UserService {
                     .username(request.getUsername())
                     .password(passwordEncoder.encode(request.getPassword()))
                     .disabled(true)
+                    .tokenCreatedAt(LocalDateTime.now())
+                    .verificationToken(createVerificationToken())
                     .role(Role.USER)
                     .build();
 
-            userRepository.save(user);
+            return userRepository.save(user);
         } else throw new BadCredentialsException("Email address is not allowed");
-
-
+//        return null;
     }
 
     public AuthenticationResponse signIn(SignInRequest request) {
@@ -65,5 +70,41 @@ public class UserService {
             return AuthenticationResponse.builder().jwt(jwt).build();
         } else throw new RuntimeException("User account is disabled");
 
+    }
+
+    public Optional<User> getUserByVerificationToken(String verificationToken) {
+        return userRepository.findByVerificationToken(verificationToken);
+    }
+
+    public void enableUser(User user) {
+        user.setDisabled(false);
+        user.setVerificationToken(null);
+        user.setTokenCreatedAt(null);
+        userRepository.save(user);
+    }
+
+    public void resendVerificationToken(User user) {
+        user.setVerificationToken(createVerificationToken());
+        user.setTokenCreatedAt(LocalDateTime.now());
+        userRepository.save(user);
+    }
+
+    public String verifyUser(String verificationToken){
+        Optional<User> user = userRepository.findByVerificationToken(verificationToken);
+        if (user.isPresent()){
+            if (user.get().isVerificationTokenExpired()){
+                return "Verification token is expired";
+
+            }else {
+                enableUser(user.get());
+//                userRepository.save(user.get());
+                return "User account "+ user.get().getUsername() + " verified successfully!";
+            }
+        }
+        return "Invalid verification token";
+    }
+
+    private String createVerificationToken() {
+        return UUID.randomUUID().toString();
     }
 }

@@ -8,6 +8,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 
@@ -29,6 +30,9 @@ public class User implements UserDetails {  //-- UserDetails is Spring Security 
     private String username;
     private String password;
     private boolean disabled;   //-- Custom account-disabled field.
+
+    private String verificationToken;
+    private LocalDateTime tokenCreatedAt;
 
     private Role role;
 
@@ -59,5 +63,10 @@ public class User implements UserDetails {  //-- UserDetails is Spring Security 
     public boolean isEnabled() {
 //        return UserDetails.super.isEnabled();
         return true;
+    }
+
+    //-- Checking whether verification token is expired
+    public boolean isVerificationTokenExpired(){
+        return tokenCreatedAt.plusMinutes(15).isBefore(LocalDateTime.now());
     }
 }

@@ -8,3 +8,14 @@ spring:
       #username: mongoadmin
       #password: password
       auto-index-creation: true
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: 
+    password:
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
