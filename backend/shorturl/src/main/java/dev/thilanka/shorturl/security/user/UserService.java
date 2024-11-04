@@ -3,6 +3,7 @@ package dev.thilanka.shorturl.security.user;
 import dev.thilanka.shorturl.entity.domains.DomainsService;
 import dev.thilanka.shorturl.security.config.AuthenticationResponse;
 import dev.thilanka.shorturl.security.config.JwtService;
+import dev.thilanka.shorturl.security.email.EmailService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -25,13 +26,17 @@ public class UserService {
     @Value("${shorturl.service.allowallurls}")
     private boolean ALLOW_ALL_URLS;
 
+    @Value("${shorturl.service.verification-token-expiration}")
+    private int verificationTokenExpiration;
+
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
     private final DomainsService domainsService;
+    private final EmailService emailService;
 
-    public User signUp(SignUpRequest request) {
+    public void signUp(SignUpRequest request) {
 
         //-- Check whether email-domain is allowed (if all URL shortening is not-allowed)
         if (ALLOW_ALL_URLS || domainsService.isEmailDomainAllowed(domainsService.emailDomainExtractor(request.getEmail()))) {
@@ -48,9 +53,10 @@ public class UserService {
                     .role(Role.USER)
                     .build();
 
-            return userRepository.save(user);
+            User savedUser = userRepository.save(user);
+            System.out.println("User saved! Sending Verification Email");
+            emailService.sendVerificationEmail(savedUser.getEmail(), savedUser.getVerificationToken());
         } else throw new BadCredentialsException("Email address is not allowed");
-//        return null;
     }
 
     public AuthenticationResponse signIn(SignInRequest request) {
@@ -72,10 +78,6 @@ public class UserService {
 
     }
 
-    public Optional<User> getUserByVerificationToken(String verificationToken) {
-        return userRepository.findByVerificationToken(verificationToken);
-    }
-
     public void enableUser(User user) {
         user.setDisabled(false);
         user.setVerificationToken(null);
@@ -83,22 +85,23 @@ public class UserService {
         userRepository.save(user);
     }
 
+    //-- Resend Verification Token if last one has been expired
     public void resendVerificationToken(User user) {
         user.setVerificationToken(createVerificationToken());
         user.setTokenCreatedAt(LocalDateTime.now());
         userRepository.save(user);
+        emailService.sendVerificationEmail(user.getEmail(), user.getVerificationToken());
     }
 
-    public String verifyUser(String verificationToken){
+    public String verifyUser(String verificationToken) {
         Optional<User> user = userRepository.findByVerificationToken(verificationToken);
-        if (user.isPresent()){
-            if (user.get().isVerificationTokenExpired()){
-                return "Verification token is expired";
-
-            }else {
+        if (user.isPresent()) {
+            if (isVerificationTokenExpired(user.get())) {
+                resendVerificationToken(user.get());
+                return "Verification link is expired. A new link is sent to your email.";
+            } else {
                 enableUser(user.get());
-//                userRepository.save(user.get());
-                return "User account "+ user.get().getUsername() + " verified successfully!";
+                return "User account " + user.get().getUsername() + " verified successfully!";
             }
         }
         return "Invalid verification token";
@@ -106,5 +109,12 @@ public class UserService {
 
     private String createVerificationToken() {
         return UUID.randomUUID().toString();
+    }
+
+    private boolean isVerificationTokenExpired(User user){
+        return user
+                .getTokenCreatedAt()
+                .plusMinutes(verificationTokenExpiration)
+                .isBefore(LocalDateTime.now());
     }
 }

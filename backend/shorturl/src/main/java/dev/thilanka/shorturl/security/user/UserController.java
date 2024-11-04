@@ -18,8 +18,8 @@ public class UserController {
 
     @PostMapping("/signup")
     public ResponseEntity<?> signUp(@Valid @RequestBody SignUpRequest request) {
-        User user = userService.signUp(request);
-        emailService.sendVerificationEmail(user.getEmail(), user.getVerificationToken());
+        userService.signUp(request);
+//        emailService.sendVerificationEmail(user.getEmail(), user.getVerificationToken());
         return ResponseEntity.status(HttpStatus.CREATED).body("User account created by: " + request.getUsername() + ". Check your email to verify the account");
     }
 

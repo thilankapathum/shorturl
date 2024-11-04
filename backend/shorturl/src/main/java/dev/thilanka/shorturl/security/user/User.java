@@ -1,6 +1,7 @@
 package dev.thilanka.shorturl.security.user;
 
 import lombok.*;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -36,6 +37,9 @@ public class User implements UserDetails {  //-- UserDetails is Spring Security 
 
     private Role role;
 
+    @Value("${shorturl.service.verification-token-expiration}")
+    private int verificationTokenExpiration;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority(role.name()));
@@ -63,10 +67,5 @@ public class User implements UserDetails {  //-- UserDetails is Spring Security 
     public boolean isEnabled() {
 //        return UserDetails.super.isEnabled();
         return true;
-    }
-
-    //-- Checking whether verification token is expired
-    public boolean isVerificationTokenExpired(){
-        return tokenCreatedAt.plusMinutes(15).isBefore(LocalDateTime.now());
     }
 }
