@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - main
+  pull_request:
+    branches:
+      - main
 
 jobs:
   build:
@@ -13,26 +16,27 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Setup JDK 11
+      - name: Setup JDK 17
         uses: actions/setup-java@v4
         with:
-          java-version: '11'
+          java-version: '17'
           distribution: 'temurin'
 
       - name: Build with Maven
-        working-directory: ./backend
-        run: mvn clean package -Dkiptests
+        working-directory: ./backend/shorturl
+        run: mvn clean package -e -Dkiptests
 
-# BUILD DOCKER IMAGE. ATTENTION TO VERSION
+# BUILD DOCKER IMAGE. PAY ATTENTION TO VERSION
       - name: Docker build
-        run: docker buildx build --platform linux/amd64 -t thilankapathum/shorturl:0.0.4-aws .
+        working-directory: ./backend/shorturl
+        run: docker buildx build --platform linux/amd64 -t thilankapathum/shorturl:0.0.5-aws .
 
       - name: Login to Docker Hub
         run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
 # PUSH DOCKER IMAGE TO DOCKER-HUB.
       - name: Push Docker Image
-        run: docker push thilankapathum/shorturl:0.0.4-aws
+        run: docker push thilankapathum/shorturl:0.0.5-aws
 
       - name: Deploy to EC2
         uses: appleboy/ssh-action@v1.1.0
@@ -42,27 +46,33 @@ jobs:
           key: ${{ secrets.AWS_SSH_PRIVATE_KEY }}
           port: 22
           script: |
-              docker stop shorturl-backend-v3 || true
-              docker rm shorturl-backend-v3 || true
-              docker rmi shorturl-backend-v3 || true
-              docker pull thilankapathum/shorturl:0.0.4-aws
+              sudo docker stop shorturl-backend-4 || true
+              sudo docker rm shorturl-backend-4 || true
+              sudo docker rmi thilankapathum/shorturl:0.0.4-aws
+              sudo docker pull thilankapathum/shorturl:0.0.5-aws
             
-              docker run -d --name shorturl-backend-4 \ 
-              -e BASE_URL=${{ secrets.BASE_URL }} \
-              -e DEFAULT_REDIRECT_URL=${{ secrets.DEFAULT_REDIRECT_URL }} \
-              -e DEFAULT_REDIRECT=${{ secrets.DEFAULT_REDIRECT }} \
-              -e JWT_SECRET=${{ secrets.JWT_SECRET }} \
-              -e JWT_EXPIRATION=${{ secrets.JWT_EXPIRATION }} \
-              -e SPRING_DATA_MONGODB_HOST=${{ secrets.DB_HOST }} \
-              -e SPRING_DATA_MONGODB_PORT=${{ secrets.DB_PORT }} \
-              -e SPRING_DATA_MONGODB_USERNAME=${{ secrets.DB_USERNAME }} \
-              -e SPRING_DATA_MONGODB_PASSWORD=${{ secrets.DB_PASSWORD }} \
-              -e SPRING_DATA_MONGODB_AUTHENTICATION_DATABASE=${{ secrets.DB_AUTH_DATABASE }} \
-              -e ALLOW_ALL_URLS=${{ secrets.ALLOW_ALL_URLS }} \
-              -e SERVER_PORT=${{ secrets.SERVER_PORT }} \
-              -e SERVER_SSL_KEY_STORE=${{ secrets.SERVER_SSL_KEY_STORE }} \
-              -e SERVER_SSL_KEY_STORE_PASSWORD=${{ secrets.SERVER_SSL_KEY_STORE_PASSWORD }} \
-              -e SERVER_SSL_KEY_STORE_TYPE=${{ secrets.SERVER_SSL_KEY_STORE_TYPE }} \
-              -e SERVER_SSL_KEY_ALIAS=${{ secrets.SERVER_SSL_KEY_ALIAS }} \
-              -v /root/keystore.jks:/keystore.jks \
-              -p 443:443 --net shorturl-net thilankapathum/shorturl:0.0.4-aws
+              sudo docker run -d --name shorturl-backend-5 \
+                -e BASE_URL="${{ secrets.BASE_URL }}" \
+                -e DEFAULT_REDIRECT_URL="${{ secrets.DEFAULT_REDIRECT_URL }}" \
+                --env DEFAULT_REDIRECT="${{ secrets.DEFAULT_REDIRECT }}" \
+                --env JWT_SECRET="${{ secrets.JWT_SECRET }}" \
+                --env JWT_EXPIRATION="${{ secrets.JWT_EXPIRATION }}" \
+                --env VERIFICATION_TOKEN_EXPIRE="${{ secrets.VERIFICATION_TOKEN_EXPIRE }}" \
+                --env SPRING_DATA_MONGODB_HOST="${{ secrets.DB_HOST }}" \
+                --env SPRING_DATA_MONGODB_PORT="${{ secrets.DB_PORT }}" \
+                --env SPRING_DATA_MONGODB_USERNAME="${{ secrets.DB_USERNAME }}" \
+                --env SPRING_DATA_MONGODB_PASSWORD="${{ secrets.DB_PASSWORD }}" \
+                --env SPRING_DATA_MONGODB_AUTHENTICATION_DATABASE="${{ secrets.DB_AUTH_DATABASE }}" \
+                --env ALLOW_ALL_URLS="${{ secrets.ALLOW_ALL_URLS }}" \
+                --env SERVER_PORT="${{ secrets.SERVER_PORT }}" \
+                --env MAIL_HOST="${{ secrets.MAIL_HOST }}" \
+                --env MAIL_PORT="${{ secrets.MAIL_PORT }}" \
+                --env MAIL_USERNAME="${{ secrets.MAIL_USERNAME }}" \
+                --env MAIL_PASSWORD="${{ secrets.MAIL_PASSWORD }}" \
+                --env SERVER_SSL_KEY_STORE="${{ secrets.SERVER_SSL_KEY_STORE }}" \
+                --env SERVER_SSL_KEY_STORE_PASSWORD="${{ secrets.SERVER_SSL_KEY_STORE_PASSWORD }}" \
+                --env SERVER_SSL_KEY_STORE_TYPE="${{ secrets.SERVER_SSL_KEY_STORE_TYPE }}" \
+                --env SERVER_SSL_KEY_ALIAS="${{ secrets.SERVER_SSL_KEY_ALIAS }}" \
+                -v /root/keystore.jks:/keystore.jks \
+                -p 443:443 \
+                --net shorturl-net thilankapathum/shorturl:0.0.5-aws

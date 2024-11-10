@@ -1,6 +1,7 @@
 spring:
   application:
     name: shorturl
+  version: ${project.version}
   profiles:
     active: prod
 
@@ -12,3 +13,4 @@ shorturl:
     defaultredirect: ${DEFAULT_REDIRECT:false}
     jwt-secret: ${JWT_SECRET:dfa2740015423f40da7388b4abed8adcd2c89e4e3b31a70ebbe59d1537d7aa2f3061fc8df5b2ff5ebac2b29a470c9e1fae9f7c42b91de951850c32a47d9a3111}
     jwt-expiration: ${JWT_EXPIRATION:120}
+    verification-token-expiration: ${VERIFICATION_TOKEN_EXPIRE:15}

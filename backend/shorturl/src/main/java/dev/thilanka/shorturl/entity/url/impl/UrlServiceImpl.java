@@ -6,9 +6,9 @@ import dev.thilanka.shorturl.entity.url.Url;
 import dev.thilanka.shorturl.exception.ResourceAlreadyExistsException;
 import dev.thilanka.shorturl.exception.ResourceNotFoundException;
 import dev.thilanka.shorturl.mapper.UrlMapper;
-import dev.thilanka.shorturl.entity.alloweddomains.AllowedDomainsRepository;
+import dev.thilanka.shorturl.entity.domains.DomainsRepository;
 import dev.thilanka.shorturl.entity.url.UrlRepository;
-import dev.thilanka.shorturl.entity.alloweddomains.AllowedDomainsService;
+import dev.thilanka.shorturl.entity.domains.DomainsService;
 import dev.thilanka.shorturl.entity.url.UrlService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,11 +33,11 @@ public class UrlServiceImpl implements UrlService {
     private boolean ALLOW_ALL_URLS;
 
     @Autowired
-    private UrlRepository urlRepository;
+    private final UrlRepository urlRepository;
     @Autowired
-    private AllowedDomainsService allowedDomainsService;
+    private final DomainsService domainsService;
     @Autowired
-    private AllowedDomainsRepository allowedDomainsRepository;
+    private final DomainsRepository domainsRepository;
 
     //-- GET ALL URLS WITH ALL INFO
     @Override
@@ -57,9 +57,9 @@ public class UrlServiceImpl implements UrlService {
     public CustomUrlRequest createShortUrl(ShortUrlRequest shortUrlRequest) {
 
         //-- CHECK WHETHER TLD IS ALLOWED (Whether all URL shortening is allowed OR Whether Domain of Long URL is included in Allowed Domains Database)
-        String topLevelDomain = allowedDomainsService.domainExtractor(shortUrlRequest.getLongUrl());
+        String topLevelDomain = domainsService.domainExtractor(shortUrlRequest.getLongUrl());
 
-        if (ALLOW_ALL_URLS || allowedDomainsService.isDomainNameAllowed(topLevelDomain)) {
+        if (ALLOW_ALL_URLS || domainsService.isUrlDomainAllowed(topLevelDomain)) {
 
             Url url = urlRepository.findByLongUrl(shortUrlRequest.getLongUrl());
 
@@ -96,9 +96,9 @@ public class UrlServiceImpl implements UrlService {
         }
 
         //-- CHECK WHETHER TLD IS ALLOWED (Whether all URL shortening is allowed OR Whether Domain of Long URL is included in Allowed Domains Database)
-        String topLevelDomain = allowedDomainsService.domainExtractor(customUrlRequest.getLongUrl());
+        String topLevelDomain = domainsService.domainExtractor(customUrlRequest.getLongUrl());
 
-        if (ALLOW_ALL_URLS || allowedDomainsService.isDomainNameAllowed(topLevelDomain)) {
+        if (ALLOW_ALL_URLS || domainsService.isUrlDomainAllowed(topLevelDomain)) {
 
             //-- CHECK FOR EXISTING LONG-URL
             if (Objects.isNull(urlRepository.findByLongUrl(customUrlRequest.getLongUrl()))) {

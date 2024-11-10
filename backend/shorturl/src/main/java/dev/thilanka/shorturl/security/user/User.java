@@ -1,6 +1,7 @@
 package dev.thilanka.shorturl.security.user;
 
 import lombok.*;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -8,6 +9,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 
@@ -30,7 +32,13 @@ public class User implements UserDetails {  //-- UserDetails is Spring Security 
     private String password;
     private boolean disabled;   //-- Custom account-disabled field.
 
+    private String verificationToken;
+    private LocalDateTime tokenCreatedAt;
+
     private Role role;
+
+    @Value("${shorturl.service.verification-token-expiration}")
+    private int verificationTokenExpiration;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
